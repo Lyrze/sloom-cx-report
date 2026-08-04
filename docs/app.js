@@ -15,7 +15,9 @@ function kpiCard(k){
 
 function render(d){
   D = d;
-  document.getElementById('navMonth').textContent = d.monthLabel;
+  var shortMonth = d.monthLabel.replace(/^\d+년\s*/, '');
+  document.getElementById('navMonth').textContent = d.navMonthLabel || d.monthLabel;
+  document.getElementById('navEvent').textContent = shortMonth + ' 접수 현황';
   document.getElementById('chPill').textContent = '채널 · ' + d.channel;
   document.title = '슬룸 ' + d.monthLabel + ' 교환·반품 리포트';
 
@@ -85,7 +87,7 @@ function render(d){
 
   /* 4. 이벤트 접수 */
   var ev = d.event;
-  H += '<section id="event"><div class="sec-head"><span class="num">4</span><h2>'+d.monthLabel.replace(/^\d+년\s*/,'')+' 접수 현황</h2>'
+  H += '<section id="event"><div class="sec-head"><span class="num">4</span><h2>'+shortMonth+' 접수 현황</h2>'
      + '<span class="desc" style="font-weight:700;color:var(--text-2)">100%환불이벤트 · 접수일 기준</span></div>'
      + '<div class="row" style="margin-bottom:16px">' + ev.kpi.map(kpiCard).join('') + '</div>'
      + '<div class="card panel" style="margin-bottom:16px"><div class="panel-head">'
