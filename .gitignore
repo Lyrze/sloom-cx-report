@@ -1,0 +1,6 @@
+# 원본 RAW (PII 포함) — 절대 커밋 금지
+*.xlsx
+*.xls
+*.csv
+raw/
+**/RAW*/
