@@ -136,7 +136,17 @@ function render(d){
      + '<div class="callout info" style="margin-top:16px"><span class="ic">📌</span><p id="ksNote">—</p></div></div>'
      + '<div class="card panel" style="margin-top:16px"><div class="panel-head"><div><div class="t">'+cx.title+'</div></div></div>'
      + '<div class="row" style="margin-bottom:16px">' + cx.kpi.map(function(k){ return kpiCard(Object.assign({}, k)); }).join('') + '</div>'
-     + '<div class="callout info"><span class="ic">💬</span><p>'+cx.body+'</p></div></div></section>';
+     + '<div class="callout info"><span class="ic">💬</span><p>'+cx.body+'</p></div>'
+     + (cx.safety ? '<details class="reason-item" style="margin-top:12px"><summary>'
+         + '<span class="r-rank" style="background:var(--bad-bg);color:var(--bad)">⚠</span>'
+         + '<div class="r-mid"><div class="r-top"><span class="r-label">'+cx.safety.label+'</span>'
+         + '<span class="r-pct" style="color:var(--bad)">'+cx.safety.count+'건</span></div></div>'
+         + '<span class="r-chev">▼</span></summary><div class="r-body">'
+         + cx.safety.quotes.map(function(q){
+             return '<div class="quote"><span class="src">'+q[0]+'</span>"'+q[1]+'"</div>';
+           }).join('')
+         + '</div></details>' : '')
+     + '</div></section>';
 
   document.getElementById('content').innerHTML = H;
   buildCharts(d);
