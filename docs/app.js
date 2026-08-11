@@ -210,8 +210,10 @@ function buildCharts(d){
     arc.setAttribute('stroke-dasharray','0 100'); arc.setAttribute('stroke-dashoffset',25);
     arc.setAttribute('transform','rotate(-90 21 21)'); sv.appendChild(arc);
     var tx = document.createElementNS(NS,'text');
-    tx.setAttribute('x',21); tx.setAttribute('y',23.5); tx.setAttribute('text-anchor','middle');
-    tx.setAttribute('font-size','9'); tx.setAttribute('font-weight','800'); tx.setAttribute('fill',col);
+    tx.setAttribute('x',21); tx.setAttribute('y',23.2); tx.setAttribute('text-anchor','middle');
+    // 링 안쪽 지름(약 26.8)을 넘지 않도록 축소 — '8.37%'처럼 5글자여도 겹치지 않게
+    tx.setAttribute('font-size','7.2'); tx.setAttribute('font-weight','800'); tx.setAttribute('fill',col);
+    tx.setAttribute('textLength','22'); tx.setAttribute('lengthAdjust','spacingAndGlyphs');
     tx.textContent = x.r+'%'; sv.appendChild(tx);
     g.appendChild(sv);
     var nm = document.createElement('div'); nm.className = 'gnm'; nm.textContent = x.n; g.appendChild(nm);
