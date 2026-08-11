@@ -359,7 +359,9 @@ function setKeySku(i){
   var def = d.rej - d.conv;
   var convR = d.rej ? d.conv/d.rej*100 : 0, defR = d.rej ? def/d.rej*100 : 0;
   document.getElementById('ksTitle').textContent = d.n;
-  document.getElementById('ksDesc').textContent = '4/1~5/30 주문 · 반려 '+d.rej+'건 → 재인입 '+d.conv+'건 / 방어 '+def+'건';
+  var coh = D.keySku.cohortLabel || '';
+  document.getElementById('ksDesc').textContent =
+    (coh ? coh + ' 주문 · ' : '') + '반려 '+d.rej+'건 → 재인입 '+d.conv+'건 / 방어 '+def+'건';
   document.getElementById('ksRej').textContent = d.rej;
   document.getElementById('ksDef').textContent = defR.toFixed(1);
   document.getElementById('ksDefSub').textContent = def+'건 방어 · 전체 평균 '+D.keySku.avgDefendRate;
@@ -367,7 +369,8 @@ function setKeySku(i){
   document.getElementById('ksConvR').textContent = '재인입률 '+convR.toFixed(1)+'%';
   document.getElementById('ksDefN').textContent = def+'건';
   document.getElementById('ksDefR').textContent = '방어율 '+defR.toFixed(1)+'%';
-  document.getElementById('ksBase').textContent = '모수 '+d.rej+'건 (4/1~5/30 주문 순수 반려)';
+  document.getElementById('ksBase').textContent =
+    '모수 '+d.rej+'건' + (coh ? ' (' + coh + ' 주문 순수 반려)' : '');
   var bar = document.getElementById('ksBar'); bar.style.width = '0';
   requestAnimationFrame(function(){ bar.style.width = convR.toFixed(1)+'%'; });
   document.getElementById('ksNote').innerHTML = '<strong>'+d.n+'</strong> — '+d.note;
