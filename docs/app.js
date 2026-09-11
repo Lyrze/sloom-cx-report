@@ -4,6 +4,18 @@ var donutColors = ['var(--c1)','var(--c2)','var(--c3)','var(--c4)','var(--c5)'];
 var NS = 'http://www.w3.org/2000/svg';
 var D = null;
 
+/* 정수 %로 반올림하되 합이 정확히 100이 되게 (최대 잔여법) */
+function pctRound(values, total){
+  if (!total) return values.map(function(){ return 0; });
+  var raw = values.map(function(v){ return v / total * 100; });
+  var out = raw.map(function(v){ return Math.floor(v); });
+  var rest = 100 - out.reduce(function(a, b){ return a + b; }, 0);
+  var order = raw.map(function(v, i){ return { i: i, frac: v - Math.floor(v) }; })
+                 .sort(function(a, b){ return b.frac - a.frac; });
+  for (var k = 0; k < rest && k < order.length; k++) out[order[k].i]++;
+  return out;
+}
+
 function badge(b){ return b ? '<span class="badge '+(b.type||'neutral')+'">'+b.text+'</span>' : ''; }
 
 function kpiCard(k){
@@ -191,10 +203,11 @@ function buildCharts(d){
   t2.textContent = '반품·교환'; svg.appendChild(t2);
 
   var leg = document.getElementById('skuLegend');
+  var legPct = pctRound(d.skuComp.map(function(x){ return x.v; }), tot);
   d.skuComp.forEach(function(x, i){
     var row = document.createElement('div'); row.className = 'dl';
     row.innerHTML = '<span class="dot" style="background:'+donutColors[i]+'"></span><span class="nm">'+x.n+'</span>'
-                  + '<span class="vl">'+x.v+'건 · '+(x.v/tot*100).toFixed(0)+'%</span>';
+                  + '<span class="vl">'+x.v+'건 · '+legPct[i]+'%</span>';
     if (d.skuDetail[x.n]) {
       row.classList.add('clickable'); row.setAttribute('data-sku', x.n);
       row.onclick = function(){ showSkuDetail(x.n); };
@@ -224,7 +237,7 @@ function buildCharts(d){
     // 링 안쪽 지름(약 26.8)을 넘지 않도록 축소 — '8.37%'처럼 5글자여도 겹치지 않게
     tx.setAttribute('font-size','7.2'); tx.setAttribute('font-weight','800'); tx.setAttribute('fill',col);
     tx.setAttribute('textLength','22'); tx.setAttribute('lengthAdjust','spacingAndGlyphs');
-    tx.textContent = x.r+'%'; sv.appendChild(tx);
+    tx.textContent = Number(x.r).toFixed(2)+'%'; sv.appendChild(tx);
     g.appendChild(sv);
     var nm = document.createElement('div'); nm.className = 'gnm'; nm.textContent = x.n; g.appendChild(nm);
     var sb = document.createElement('div'); sb.className = 'gsub';
@@ -244,6 +257,7 @@ function buildCharts(d){
   });
   d.crossRows.forEach(function(r){
     var t = r.v.reduce(function(a,b){ return a+b; }, 0);
+    var rowPct = pctRound(r.v, t);   // 라벨용 정수 %, 행 합계 100% 보장
     var rw = document.createElement('div'); rw.className = 'xbar-row';
     var nm = document.createElement('div'); nm.className = 'xbar-name'; nm.textContent = r.n;
     var bar = document.createElement('div'); bar.className = 'xbar';
@@ -254,7 +268,8 @@ function buildCharts(d){
       sg.setAttribute('data-w', pct.toFixed(2)+'%'); sg.style.width = '0';
       sg.style.background = d.crossCats[i].c;
       sg.title = d.crossCats[i].n+' '+v+'건 ('+pct.toFixed(1)+'%)';
-      if (pct >= 9) sg.textContent = Math.round(pct)+'%';
+      // 5% 미만은 폭이 좁아 글자가 넘치므로 생략 (툴팁·범례로 확인)
+      if (pct >= 5) sg.textContent = rowPct[i]+'%';
       bar.appendChild(sg);
     });
     var tt = document.createElement('div'); tt.className = 'xbar-total'; tt.textContent = t+'건';
