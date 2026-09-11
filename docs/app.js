@@ -67,7 +67,15 @@ function render(d){
        }).join('')
      + '<div style="border-top:1px solid var(--border);margin-top:4px;padding-top:8px;display:flex;justify-content:space-between;font-size:13px"><span style="font-weight:700">'+s2.total.k+'</span><b style="color:var(--accent)">'+s2.total.v+'</b></div>'
      + '<div style="display:flex;justify-content:space-between;font-size:11.5px;color:var(--muted)"><span>'+s2.totalNote+'</span></div>'
-     + '</div></div></div></section>';
+     + '</div></div></div>'
+     + (d.trend ? '<div class="card panel" style="margin-top:16px">'
+         + '<div class="panel-head"><div><div class="t">'+d.trend.title+'</div>'
+         + '<div class="d">'+d.trend.desc+'</div></div></div>'
+         + '<div style="position:relative;height:120px"><div style="position:absolute;inset:0;display:flex;align-items:flex-end;gap:14px" id="trendBars"></div></div>'
+         + '<div class="chart-axis" id="trendAxis"></div>'
+         + '<div style="overflow-x:auto;margin-top:14px"><table id="trendTable"></table></div>'
+         + '</div>' : '')
+     + '</section>';
 
   /* 3. 사유 · 제품 */
   H += '<section id="reason-sku"><div class="sec-head"><span class="num">3</span><h2>사유 · 제품 분석</h2></div>'
@@ -165,6 +173,46 @@ function render(d){
   initMotion();
 }
 
+function buildTrend(t){
+  var wrap = document.getElementById('trendBars');
+  var ax = document.getElementById('trendAxis');
+  var tbl = document.getElementById('trendTable');
+  if (!wrap || !ax || !tbl) return;
+  var ms = t.months || [];
+  if (!ms.length) return;
+  // 0 기준 + 최대값에 15% 여유 (막대 차이를 부풀리지 않도록)
+  var top = Math.max.apply(null, ms.map(function(x){ return x.rate; })) * 1.15;
+  ms.forEach(function(x, i){
+    var col = document.createElement('div');
+    col.style.cssText = 'flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%';
+    var lab = document.createElement('div');
+    lab.textContent = x.rate.toFixed(2) + '%';
+    lab.style.cssText = 'font-size:11.5px;font-weight:800;margin-bottom:5px;'
+      + (i === ms.length - 1 ? 'color:var(--accent)' : 'color:var(--text-2)');
+    var bar = document.createElement('div');
+    bar.style.cssText = 'width:100%;max-width:74px;height:0%;border-radius:6px 6px 0 0;'
+      + 'transition:height .9s cubic-bezier(.22,1,.36,1);background:'
+      + (i === ms.length - 1 ? 'var(--accent)' : 'var(--c2)');
+    bar.setAttribute('data-h', Math.max(4, x.rate / top * 100) + '%');
+    bar.title = x.m + ' 반품·교환률 ' + x.rate + '% (' + x.cases + '건 / 출고 ' + x.ship.toLocaleString() + '개)';
+    col.appendChild(lab); col.appendChild(bar); wrap.appendChild(col);
+    var sp = document.createElement('span'); sp.textContent = x.m; ax.appendChild(sp);
+  });
+  var th = '<thead><tr><th>구분</th>'
+    + ms.map(function(x, i){
+        return '<th class="num"' + (i === ms.length - 1 ? ' style="color:var(--text)"' : '') + '>' + x.m + '</th>';
+      }).join('') + '</tr></thead>';
+  var tb = '<tbody>' + (t.rows || []).map(function(r){
+      return '<tr><td>' + r.k + '</td>'
+        + ms.map(function(x, i){
+            var v = x[r.f];
+            return '<td class="num"' + (i === ms.length - 1 ? ' style="font-weight:800"' : '') + '>'
+              + (typeof v === 'number' ? v.toLocaleString() : v) + '</td>';
+          }).join('') + '</tr>';
+    }).join('') + '</tbody>';
+  tbl.innerHTML = th + tb;
+}
+
 function buildCharts(d){
   /* 유형별 막대 */
   var max = Math.max.apply(null, d.section2.bars.map(function(x){ return x.v; }));
@@ -180,6 +228,9 @@ function buildCharts(d){
     w.appendChild(l); w.appendChild(b); bars.appendChild(w);
     var s = document.createElement('span'); s.textContent = x.l; ax.appendChild(s);
   });
+
+  /* 월별 추이 (선택) */
+  if (d.trend) buildTrend(d.trend);
 
   /* 도넛 */
   var tot = d.skuComp.reduce(function(a,x){ return a+x.v; }, 0), off = 25;
