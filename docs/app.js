@@ -70,8 +70,8 @@ function render(d){
      + '</div></div></div>'
      + (d.trend ? '<div class="card panel" style="margin-top:16px">'
          + '<div class="panel-head"><div><div class="t">'+d.trend.title+'</div>'
-         + '<div class="d">'+d.trend.desc+'</div></div></div>'
-         + '<div style="position:relative;height:120px"><div style="position:absolute;inset:0;display:flex;align-items:flex-end;gap:14px" id="trendBars"></div></div>'
+         + (d.trend.desc ? '<div class="d">'+d.trend.desc+'</div>' : '') + '</div></div>'
+         + '<div style="position:relative;height:120px"><div style="position:absolute;inset:0;display:flex;align-items:flex-end" id="trendBars"></div></div>'
          + '<div class="chart-axis" id="trendAxis"></div>'
          + '<div style="overflow-x:auto;margin-top:14px"><table id="trendTable"></table></div>'
          + '</div>' : '')
@@ -180,11 +180,15 @@ function buildTrend(t){
   if (!wrap || !ax || !tbl) return;
   var ms = t.months || [];
   if (!ms.length) return;
+  ax.style.gap = '0';   // 막대 컨테이너와 열 폭을 맞춤
   // 0 기준 + 최대값에 15% 여유 (막대 차이를 부풀리지 않도록)
   var top = Math.max.apply(null, ms.map(function(x){ return x.rate; })) * 1.15;
   ms.forEach(function(x, i){
     var col = document.createElement('div');
-    col.style.cssText = 'flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%';
+    // gap 대신 padding + border-left → 구분선이 두 막대 사이 정중앙에 온다
+    col.style.cssText = 'flex:1;display:flex;flex-direction:column;align-items:center;'
+      + 'justify-content:flex-end;height:100%;padding:0 8px;'
+      + (i ? 'border-left:1px solid var(--border);' : '');
     var lab = document.createElement('div');
     lab.textContent = x.rate.toFixed(2) + '%';
     lab.style.cssText = 'font-size:11.5px;font-weight:800;margin-bottom:5px;'
