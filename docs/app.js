@@ -251,27 +251,51 @@ function buildCharts(d){
 
   /* 제품×사유 누적바 */
   var cl = document.getElementById('crossLegend'), cc = document.getElementById('crossChart');
+  var ETC_MIN = 5;        // 이 % 미만 조각은 막대 폭이 좁아 글자가 안 들어감
+  var ETC_COLOR = 'var(--muted)';
+  var needEtc = d.crossRows.some(function(r){
+    var t = r.v.reduce(function(a,b){ return a+b; }, 0);
+    return r.v.some(function(v){ return v && v/t*100 < ETC_MIN; });
+  });
   d.crossCats.forEach(function(c){
     var s = document.createElement('span'); s.className = 'i';
     s.innerHTML = '<i style="background:'+c.c+'"></i>'+c.n; cl.appendChild(s);
   });
+  if (needEtc) {
+    var se = document.createElement('span'); se.className = 'i';
+    se.innerHTML = '<i style="background:'+ETC_COLOR+'"></i>기타 (5% 미만 합계)';
+    cl.appendChild(se);
+  }
   d.crossRows.forEach(function(r){
     var t = r.v.reduce(function(a,b){ return a+b; }, 0);
     var rowPct = pctRound(r.v, t);   // 라벨용 정수 %, 행 합계 100% 보장
     var rw = document.createElement('div'); rw.className = 'xbar-row';
     var nm = document.createElement('div'); nm.className = 'xbar-name'; nm.textContent = r.n;
     var bar = document.createElement('div'); bar.className = 'xbar';
+    var etcV = 0, etcP = 0, etcParts = [];
     r.v.forEach(function(v, i){
       if (!v) return;
       var pct = v/t*100;
+      if (pct < ETC_MIN) {   // 작은 조각은 모아서 '기타' 한 칸으로
+        etcV += v; etcP += rowPct[i];
+        etcParts.push(d.crossCats[i].n+' '+v+'건 ('+pct.toFixed(1)+'%)');
+        return;
+      }
       var sg = document.createElement('div'); sg.className = 'xseg';
       sg.setAttribute('data-w', pct.toFixed(2)+'%'); sg.style.width = '0';
       sg.style.background = d.crossCats[i].c;
       sg.title = d.crossCats[i].n+' '+v+'건 ('+pct.toFixed(1)+'%)';
-      // 5% 미만은 폭이 좁아 글자가 넘치므로 생략 (툴팁·범례로 확인)
-      if (pct >= 5) sg.textContent = rowPct[i]+'%';
+      sg.textContent = rowPct[i]+'%';
       bar.appendChild(sg);
     });
+    if (etcV) {
+      var eg = document.createElement('div'); eg.className = 'xseg';
+      eg.setAttribute('data-w', (etcV/t*100).toFixed(2)+'%'); eg.style.width = '0';
+      eg.style.background = ETC_COLOR;
+      eg.title = '기타 — ' + etcParts.join(' · ');
+      eg.textContent = etcP+'%';
+      bar.appendChild(eg);
+    }
     var tt = document.createElement('div'); tt.className = 'xbar-total'; tt.textContent = t+'건';
     rw.appendChild(nm); rw.appendChild(bar); rw.appendChild(tt); cc.appendChild(rw);
   });
@@ -286,9 +310,18 @@ function buildCharts(d){
   setKeySku(0);
 }
 
+var _evtPoints = null, _evtEvery = 2;
 function drawEvtLine(points, labelEvery){
   var svg = document.getElementById('eventLine'); svg.innerHTML = '';
-  var n = points.length, W = 720, H = 190, pad = 16;
+  _evtPoints = points; _evtEvery = labelEvery;
+  var H = 190, pad = 16;
+  // viewBox 폭을 실제 렌더 폭에 맞춘다. 고정값(720) + preserveAspectRatio="none"으로 두면
+  // 컨테이너가 넓을 때 가로로만 늘어나 점이 타원이 되고 숫자가 찌그러진다.
+  var box = svg.getBoundingClientRect ? svg.getBoundingClientRect().width : 0;
+  var W = Math.round(box) || 720;
+  svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
+  svg.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+  var n = points.length;
   var maxV = Math.max.apply(null, points.map(function(x){ return x.v; }));
   function X(i){ return n === 1 ? W/2 : i/(n-1)*(W-20)+10; }
   function Y(v){ return H-pad-(v/maxV)*(H-pad*2); }
@@ -418,7 +451,13 @@ function initMotion(){
     if (tick) return; tick = true;
     requestAnimationFrame(function(){ sync(); tick = false; });
   }, { passive: true });
-  window.addEventListener('resize', sync); sync();
+  var rzT = null;
+  window.addEventListener('resize', function(){
+    sync();
+    clearTimeout(rzT);
+    rzT = setTimeout(function(){ if (_evtPoints) drawEvtLine(_evtPoints, _evtEvery); }, 150);
+  });
+  sync();
 
   var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var els = [].slice.call(document.querySelectorAll('.content .card, .content .insight, .content .sku-detail'));
@@ -442,6 +481,16 @@ function initMotion(){
     var vals = root.classList.contains('kpi') ? root.querySelectorAll('.value') : root.querySelectorAll('.kpi .value');
     [].forEach.call(vals, countUp);
   }
+  // 초기 렌더가 레이아웃 완료 전이면 라인차트 viewBox가 fallback(720)으로 잡힌다.
+  // 실제 폭이 다르면 한 번만 다시 그린다(같으면 재그리기 없음 → 애니메이션 중복 방지).
+  requestAnimationFrame(function(){
+    var sv = document.getElementById('eventLine');
+    if (!sv || !_evtPoints) return;
+    var real = Math.round(sv.getBoundingClientRect().width);
+    var cur = parseFloat((sv.getAttribute('viewBox') || '0 0 720 190').split(' ')[2]);
+    if (real && Math.abs(real - cur) > 1) drawEvtLine(_evtPoints, _evtEvery);
+  });
+
   if (reduce || !('IntersectionObserver' in window)) { els.forEach(play); return; }
   els.forEach(function(el){ el.classList.add('reveal'); });
   var io = new IntersectionObserver(function(es){
