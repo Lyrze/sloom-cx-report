@@ -444,7 +444,8 @@ function showSkuDetail(name){
   document.querySelectorAll('.dl.clickable,.gauge.clickable').forEach(function(el){
     el.classList.toggle('sel', el.getAttribute('data-sku') === name);
   });
-  var maxR = d.reasons[0][1], maxD = d.defects[0][1];
+  var dfs = d.defects || [];
+  var maxR = d.reasons[0][1], maxD = dfs.length ? dfs[0][1] : 1;
   var html = '<div class="sd-head"><div class="sd-name">'+name+'</div>'
     + '<div class="sd-top">최다 사유 <span class="tag bad">'+d.top+' '+d.topCnt+'건 · '+d.topPct+'%</span></div></div>'
     + '<div class="sd-grid"><div class="sd-col"><div class="sd-label">사유 구성</div>'
@@ -453,10 +454,10 @@ function showSkuDetail(name){
              + '<div class="sd-track"><div class="sd-fill" data-w="'+(r[1]/maxR*100)+'%" style="width:0;background:var(--accent)"></div></div></div>';
       }).join('')
     + '</div><div class="sd-col"><div class="sd-label">불량 세부 사유</div>'
-    + d.defects.map(function(r){
+    + (dfs.length ? dfs.map(function(r){
         return '<div class="sd-bar"><div class="sd-bt"><span>'+r[0]+'</span><span style="font-weight:700">'+r[1]+'건</span></div>'
              + '<div class="sd-track"><div class="sd-fill" data-w="'+(r[1]/maxD*100)+'%" style="width:0"></div></div></div>';
-      }).join('')
+      }).join('') : '<div class="sd-quote" style="margin:0">세부사유 기재 건이 없습니다</div>')
     + '</div><div class="sd-col"><div class="sd-label">고객 발화 예시</div>'
     + d.quotes.map(function(q){
         return '<div class="sd-quote"><span class="src">'+q[0]+'</span>"'+q[1]+'"</div>';
