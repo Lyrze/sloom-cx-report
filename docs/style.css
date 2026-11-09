@@ -225,6 +225,7 @@
   .chart-axis span{flex:1;text-align:center;font-size:10px;color:var(--muted)}
   .callout{display:flex;gap:12px;align-items:flex-start;padding:14px 16px;border-radius:10px;background:var(--warn-bg);border:1px solid rgba(200,132,42,.25)}
   .callout.info{background:rgba(46,107,230,.08);border-color:rgba(46,107,230,.22)}
+  .callout.bad{background:var(--bad-bg);border-color:rgba(198,50,56,.28)}
   .callout .ic{flex:none;font-size:15px}
   .callout p{margin:0;font-size:12.5px;line-height:1.6;color:var(--text-2)} .callout strong{color:var(--text)}
   .foot-banner{display:flex;align-items:center;gap:10px;padding:14px 18px;border-radius:12px;background:var(--card);border:1px dashed var(--border);font-size:12px;color:var(--muted)}
