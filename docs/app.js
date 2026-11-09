@@ -133,28 +133,7 @@ function render(d){
      + '<div class="dv">'+rj.defend.n+'</div><div class="dr">'+rj.defend.r+'</div></div></div>'
      + '<div class="def-base">'+rj.base+'</div>'
      + '<div class="def-bar"><div class="seg-conv" data-w="'+rj.convPct+'%" style="width:0"></div></div>'
-     + '<div class="callout info" style="margin-top:16px"><span class="ic">📌</span><p>'+rj.note+'</p></div></div>'
-     // 이벤트에서 번진 크리티컬 상담 — 반려·전환 지표와 성격이 달라 별도 패널로 뺀다(없으면 미렌더)
-     + (rj.critical ? '<div class="card panel" style="margin-top:16px;border-color:rgba(198,50,56,.35)">'
-         + '<div class="panel-head"><div><div class="t">'+rj.critical.title+'</div>'
-         + '<div class="d">'+rj.critical.desc+'</div></div>'
-         + '<span class="tag bad">'+rj.critical.value+'건</span></div>'
-         + '<div class="row" style="margin-bottom:14px">'
-         + (rj.critical.kpi || []).map(kpiCard).join('') + '</div>'
-         + '<div class="callout bad"><span class="ic">🚨</span><p>'+rj.critical.body+'</p></div>'
-         + (rj.critical.quotes && rj.critical.quotes.length
-             ? '<details class="reason-item" style="margin-top:12px"><summary>'
-               + '<span class="r-rank" style="background:var(--bad-bg);color:var(--bad)">⚠</span>'
-               + '<div class="r-mid"><div class="r-top"><span class="r-label">'+rj.critical.quoteLabel+'</span>'
-               + '<span class="r-pct" style="color:var(--bad)">'+rj.critical.quotes.length+'건</span></div></div>'
-               + '<span class="r-chev">▼</span></summary><div class="r-body">'
-               + rj.critical.quotes.map(function(q){
-                   return '<div class="quote"><span class="src">'+q[0]+'</span>"'+q[1]+'"</div>';
-                 }).join('')
-               + '</div></details>'
-             : '')
-         + '</div>' : '')
-     + '</section>';
+     + '<div class="callout info" style="margin-top:16px"><span class="ic">📌</span><p>'+rj.note+'</p></div></div></section>';
 
   /* 6. 주요 제품 + CX 코멘트 */
   var ks = d.keySku, cx = d.cxComment;
@@ -175,6 +154,21 @@ function render(d){
      + '<div class="def-base" id="ksBase">—</div>'
      + '<div class="def-bar"><div class="seg-conv" id="ksBar" style="width:0"></div></div>'
      + '<div class="callout info" style="margin-top:16px"><span class="ic">📌</span><p id="ksNote">—</p></div></div>'
+     // 이벤트에서 번진 크리티컬 상담 — CX 종합 코멘트 바로 위에 원문과 함께 둔다(없으면 미렌더)
+     + (cx.critical ? '<div class="card panel" style="margin-top:16px;border-color:rgba(198,50,56,.35)">'
+         + '<div class="panel-head"><div><div class="t">'+cx.critical.title+'</div>'
+         + '<div class="d">'+cx.critical.desc+'</div></div>'
+         + '<span class="tag bad">'+cx.critical.value+'건</span></div>'
+         + '<div class="row" style="margin-bottom:14px">'
+         + (cx.critical.kpi || []).map(kpiCard).join('') + '</div>'
+         + '<div class="callout bad"><span class="ic">🚨</span><p>'+cx.critical.body+'</p></div>'
+         + (cx.critical.quotes && cx.critical.quotes.length
+             ? '<div class="r-body" style="margin-top:12px">'
+               + cx.critical.quotes.map(function(q){
+                   return '<div class="quote"><span class="src">'+q[0]+'</span>"'+q[1]+'"</div>';
+                 }).join('') + '</div>'
+             : '')
+         + '</div>' : '')
      + '<div class="card panel" style="margin-top:16px"><div class="panel-head"><div><div class="t">'+cx.title+'</div></div></div>'
      + '<div class="row" style="margin-bottom:16px">' + cx.kpi.map(function(k){ return kpiCard(Object.assign({}, k)); }).join('') + '</div>'
      + '<div class="callout info"><span class="ic">💬</span><p>'+cx.body+'</p></div>'
