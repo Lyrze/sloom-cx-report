@@ -423,18 +423,22 @@ function drawEvtLine(points, labelEvery){
 function renderEvtDaily(d){
   var thead = document.getElementById('evtThead'), tb = document.getElementById('eventTbody');
   tb.innerHTML = '';
+  // 2026-10부터는 주말 접수가 그 날짜로 바로 찍혀 '월요일 누적'이 사실이 아니다.
+  // mondayNote 를 ''로 주면 월요일 강조·비고를 끈다(과거 월은 필드가 없어 기존 문구 유지).
+  var mNote = (d.event.mondayNote !== undefined) ? d.event.mondayNote : '주말 접수분 누적 처리';
+  var hiMon = mNote !== '';
   var pts = d.event.daily.map(function(x){
-    return { v:x[2], hi:x[1]===0, ax:x[0].slice(3), tip:x[0]+' ('+dayNames[x[1]]+') '+x[2]+'건' };
+    return { v:x[2], hi:hiMon && x[1]===0, ax:x[0].slice(3), tip:x[0]+' ('+dayNames[x[1]]+') '+x[2]+'건' };
   });
   drawEvtLine(pts, 2);
   thead.innerHTML = '<tr><th>일자</th><th>요일</th><th class="num">접수 건수</th><th>비고</th></tr>';
   d.event.daily.forEach(function(x){
-    var mon = x[1] === 0;
+    var mon = hiMon && x[1] === 0;
     var tr = document.createElement('tr'); if (mon) tr.className = 'is-monday';
     tr.innerHTML = '<td'+(mon?' class="mon-day"':'')+'>'+x[0]+'</td>'
                  + '<td'+(mon?' class="mon-day"':'')+'>'+dayNames[x[1]]+'</td>'
                  + '<td class="num"'+(mon?' style="font-weight:800"':'')+'>'+x[2]+'</td>'
-                 + '<td style="font-size:11.5px;color:var(--muted)">'+(mon?'주말 접수분 누적 처리':'')+'</td>';
+                 + '<td style="font-size:11.5px;color:var(--muted)">'+(mon?mNote:'')+'</td>';
     tb.appendChild(tr);
   });
 }
