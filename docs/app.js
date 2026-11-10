@@ -11,7 +11,9 @@ function T(s){
   return String(s == null ? '' : s)
     .replace(/[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{FE0F}]/gu, '')
     .replace(/<span style="font-size:11\.5px;color:var\(--muted\)">/g, '<span class="fine">')
-    .replace(/\s{2,}/g, ' ');
+    .replace(/\s{2,}/g, ' ')
+    /* 문장이 끝나면 줄을 바꾼다 — "~입니다. 다음 문장"이 한 줄로 이어지면 읽기 어렵다 (소수점 '5.25'는 공백이 없어 제외) */
+    .replace(/([다요음함]\.|\)\.|%\.|건\.|원\.)\s+(?!<br)(?=\S)/g, '$1<br>');
 }
 function esc(s){ return String(s == null ? '' : s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
 function pctRound(values, total){
