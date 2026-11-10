@@ -7,34 +7,32 @@
 <meta name="googlebot" content="noindex, nofollow">
 <title>슬룸 교환·반품 리포트</title>
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.css">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 <div class="shell">
-  <nav class="sidebar">
-    <div class="brand"><div class="mark">슬룸</div><div class="sub">교환·반품 리포트</div></div>
-    <div class="nav-label" id="navMonth">—</div>
-    <a class="nav-link active" href="#summary"><span class="n">1</span>핵심 요약</a>
-    <a class="nav-link" href="#trend"><span class="n">2</span>자사몰 반품/교환 규모</a>
-    <a class="nav-link" href="#reason-sku"><span class="n">3</span>사유 · 제품 분석</a>
-    <a class="nav-link" href="#event"><span class="n">4</span><span id="navEvent">접수 현황</span></a>
-    <a class="nav-link" href="#reject"><span class="n">5</span>반려 · 전환 현황</a>
-    <a class="nav-link" href="#key-sku"><span class="n">6</span>주요 제품 반려·전환</a>
+  <nav class="side" aria-label="리포트 목차">
+    <div class="brand"><span class="m">S</span><span class="n">슬룸 CX</span></div>
+    <div class="scope">올릿리테일 <span>아임웹 자사몰</span></div>
+    <a href="#summary" class="on"><svg viewBox="0 0 20 20"><path d="M3 16V8m4.5 8V4m4.5 12v-6m4.5 6V7"/></svg>핵심 요약</a>
+    <a href="#scale"><svg viewBox="0 0 20 20"><rect x="3" y="4" width="14" height="12" rx="1.5"/><path d="M3 8h14"/></svg>반품·교환 규모</a>
+    <a href="#reasons"><svg viewBox="0 0 20 20"><rect x="3" y="3" width="6" height="6" rx="1"/><rect x="11" y="3" width="6" height="6" rx="1"/><rect x="3" y="11" width="6" height="6" rx="1"/><rect x="11" y="11" width="6" height="6" rx="1"/></svg>사유와 제품</a>
+    <div class="grp">30일 무료체험</div>
+    <a href="#event"><svg viewBox="0 0 20 20"><path d="M4 5h12v10H4z"/><path d="M4 9h12M8 3v3m4-3v3"/></svg>신청 현황</a>
+    <a href="#reject"><svg viewBox="0 0 20 20"><path d="M10 3v9m0 0 3.5-3.5M10 12 6.5 8.5M4 16h12"/></svg>반품 불가 안내 결과</a>
+    <a href="#cx"><svg viewBox="0 0 20 20"><path d="M4 5h12v8H9l-4 3v-3H4z"/></svg>CX팀 코멘트</a>
+    <div class="foot">매월 10일 전후 갱신<br>수치는 그 달에 출고된 주문 기준</div>
   </nav>
 
-  <div class="main">
-    <header class="topbar">
-      <div class="topbar-left">
-        <span class="pill solid">브랜드 · 슬룸</span>
-        <select class="month-sel" id="monthSel" aria-label="기간 선택"></select>
-        <span class="pill" id="chPill">채널 · —</span>
-      </div>
-    </header>
-
-    <div class="content" id="content">
-      <div class="loading">데이터를 불러오는 중…</div>
+  <div class="sheetwrap">
+  <main class="sheet">
+    <div class="bar">
+      <div class="crumb">월간 리포트 · <b id="crumbM">—</b></div>
+      <select class="sel" id="monthSel" aria-label="기간 선택"></select>
     </div>
+    <div id="content"><div class="loading">데이터를 불러오는 중…</div></div>
+  </main>
   </div>
 </div>
 <script src="app.js"></script>
