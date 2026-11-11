@@ -151,7 +151,7 @@ function render(d){
   /* 규모 — 증감 · 추이 */
   H += '<div id="scale" class="anchor"></div>';
   var rowA = [];
-  if (d.reasonDelta) rowA.push(card((d.reasonDelta.prevLabel || '전월')+' 대비 무엇이 늘었나', '사유 대분류 · 건수 증감', '<div class="delta" id="delta"></div><table class="t num" id="deltaTable" style="margin-top:0"></table>', '', '전월 대비 사유별 증감'));
+  if (d.reasonDelta) rowA.push(card((d.reasonDelta.prevLabel || '전월')+' 대비 무엇이 늘었나', '사유 대분류 · 건수 증감', '<div class="delta" id="delta"></div><table class="t num" id="deltaTable" style="margin-top:0"></table>'+(d.reasonDelta.note ? '<p class="note" style="margin-top:12px">'+T(d.reasonDelta.note)+'</p>' : ''), '', '전월 대비 사유별 증감'));
   if (d.trend && d.trend.months && d.trend.months.length) rowA.push(card(d.trend.title || '최근 추이', d.trend.desc || '그 달에 출고된 주문 기준 · 출고 대비', '<div id="trendLine" class="chart"></div><table class="t num" id="trendTable"></table>', '', '월별 추이'));
   if (rowA.length) H += '<div class="r2">'+rowA.join('')+'</div>';
 
@@ -250,7 +250,7 @@ function render(d){
   }).join('');
   H += '<div class="r2">'
      + card(rj.panelTitle || rj.title, rj.panelDesc, rejBody, '', '반품 불가 안내 결과')
-     + card(ks.title, ks.cohortLabel ? ks.cohortLabel+' 주문' : '', ksBody, '', '주요 제품')
+     + card(ks.title, ks.desc || (ks.cohortLabel ? ks.cohortLabel+' 주문' : ''), ksBody + (ks.note ? '<p class="note" style="margin-top:14px">'+T(ks.note)+'</p>' : ''), '', '주요 제품')
      + '</div>';
 
   /* CX 코멘트 */
