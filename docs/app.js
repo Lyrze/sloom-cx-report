@@ -151,7 +151,7 @@ function render(d){
   /* 규모 — 증감 · 추이 */
   H += '<div id="scale" class="anchor"></div>';
   var rowA = [];
-  if (d.reasonDelta) rowA.push(card((d.reasonDelta.prevLabel || '전월')+' 대비 무엇이 늘었나', '사유 대분류 · 건수 증감', '<div class="delta" id="delta"></div><table class="t num" id="deltaTable" style="margin-top:0"></table>'+(d.reasonDelta.note ? '<p class="note" style="margin-top:12px">'+T(d.reasonDelta.note)+'</p>' : ''), '', '전월 대비 사유별 증감'));
+  if (d.reasonDelta) rowA.push(card((d.reasonDelta.prevLabel || '전월')+' 대비 사유별 증감', '사유 대분류 · 건수 증감', '<div class="delta" id="delta"></div><table class="t num" id="deltaTable" style="margin-top:0"></table>'+(d.reasonDelta.note ? '<p class="note" style="margin-top:12px">'+T(d.reasonDelta.note)+'</p>' : ''), '', '전월 대비 사유별 증감'));
   if (d.trend && d.trend.months && d.trend.months.length) rowA.push(card(d.trend.title || '최근 추이', d.trend.desc || '그 달에 출고된 주문 기준 · 출고 대비', '<div id="trendLine" class="chart"></div><table class="t num" id="trendTable"></table>', '', '월별 추이'));
   if (rowA.length) H += '<div class="r2">'+rowA.join('')+'</div>';
 
@@ -164,7 +164,7 @@ function render(d){
   var compTable = '<table class="t num"><tr><th>제품</th><th class="n">건수</th><th class="n">비중</th></tr>'
     + d.skuComp.map(function(x, i){ return '<tr>'+trackRow(x.n, x.v / cmax * 100, i === 0)+'<td class="n top">'+n(x.v)+'</td><td class="n top faint">'+compPct[i]+'%</td></tr>'; }).join('')+'</table>';
   H += '<div class="r2">'
-     + card(s2.panelTitle || '유형별 건수', s2.panelDesc, '<div id="typeBars" class="chart"></div>'+typeTable, '', '유형별 건수')
+     + card(s2.panelTitle || '유형별 접수 건수', s2.panelDesc, '<div id="typeBars" class="chart"></div>'+typeTable, '', '유형별 건수')
      + card('제품별 접수 구성', n(ctot)+'건', compTable + (d.skuCompDesc ? '<p class="note">'+T(d.skuCompDesc)+'</p>' : ''), '', '제품별 접수 구성')
      + '</div>';
 
@@ -189,8 +189,8 @@ function render(d){
     + defs.map(function(x){ return '<tr>'+trackRow(x[0], x[1] / dmax * 100, false)+'<td class="n top">'+n(x[1])+'</td><td class="n top faint">'+(x[1] / dtot * 100).toFixed(1)+'%</td></tr>'; }).join('')+'</table>'
     : '<p class="note" style="margin-top:14px">세부 항목이 기재된 건이 없습니다.</p>';
   H += '<div class="r2">'
-     + card('제품별 출고 대비 반품 비율', '출고 100개 이상인 제품', rateTable + '<p class="note">출고가 적은 제품은 한 건만 늘어도 비율이 크게 움직입니다.</p>', '', '제품별 반품 비율')
-     + card('제품 문제 세부 항목', topSku ? esc(topSku)+' · 상위 '+defs.length+'종' : '', defTable, '', '제품 문제 세부 항목')
+     + card('제품별 반품률', '출고 100개 이상 제품 · 출고 대비', rateTable + '<p class="note">출고가 적은 제품은 한 건만 늘어도 비율이 크게 움직입니다.</p>', '', '제품별 반품 비율')
+     + card('불량 세부 사유', topSku ? esc(topSku)+' · 상위 '+defs.length+'종' : '', defTable, '', '제품 문제 세부 항목')
      + '</div>';
 
   if (d.crossRows && d.crossRows.length){
@@ -212,7 +212,7 @@ function render(d){
       return '<section class="card"><div class="pd"><div class="nm">'+esc(name)+'</div>'
         + '<div class="tp">가장 많은 사유 · '+esc(x.top)+' '+n(x.topCnt)+'건 ('+x.topPct+'%)</div>'
         + '<dl>'+x.reasons.map(function(r){ return '<dt>'+esc(r[0])+'</dt><dd>'+n(r[1])+'</dd>'; }).join('')+'</dl>'
-        + ((x.defects || []).length ? '<div class="sub">제품 문제 세부</div><dl>'+x.defects.slice(0, 4).map(function(r){ return '<dt>'+esc(r[0])+'</dt><dd>'+n(r[1])+'</dd>'; }).join('')+'</dl>' : '')
+        + ((x.defects || []).length ? '<div class="sub">불량 세부 사유</div><dl>'+x.defects.slice(0, 4).map(function(r){ return '<dt>'+esc(r[0])+'</dt><dd>'+n(r[1])+'</dd>'; }).join('')+'</dl>' : '')
         + ((x.quotes || []).length ? '<div class="sub">고객의 말</div>'+x.quotes.map(function(q){ return '<div class="qq"><span class="src">'+esc(q[0])+'</span>'+esc(q[1])+'</div>'; }).join('') : '')
         + '</div></section>';
     }).join('')+'</div>';
@@ -228,8 +228,8 @@ function render(d){
       + (last ? '<tr><td><b>누계</b></td><td></td><td></td><td><b>'+n(ev.daily.reduce(function(a, x){ return a + x[2]; }, 0))+'</b></td></tr>' : '<tr><td>&nbsp;</td><td></td><td></td><td></td></tr>')+'</table>';
   }
   H += '<div class="r2">'
-     + card(ev.chartTitle || shortMonth+' 신청 일별 건수', ev.chartDesc, statRow(ev.kpi || [], Math.min(3, (ev.kpi || []).length || 1)) + '<div id="evLine" class="chart"></div>' + (ev.note ? '<p class="note">'+T(ev.note)+'</p>' : ''), '', '일별 신청 추이')
-     + card('일별 신청', ev.tableTag, '<div class="daywrap">'+dayTable(ev.daily.slice(0, half), false)+dayTable(ev.daily.slice(half), true)+'</div>', '', '일별 신청 표')
+     + card(ev.chartTitle || shortMonth+' 이벤트 접수 일별 추이', ev.chartDesc, statRow(ev.kpi || [], Math.min(3, (ev.kpi || []).length || 1)) + '<div id="evLine" class="chart"></div>' + (ev.note ? '<p class="note">'+T(ev.note)+'</p>' : ''), '', '일별 신청 추이')
+     + card('일별 이벤트 접수', ev.tableTag, '<div class="daywrap">'+dayTable(ev.daily.slice(0, half), false)+dayTable(ev.daily.slice(half), true)+'</div>', '', '일별 신청 표')
      + '</div>';
 
   /* 반품 불가 안내 결과 */
@@ -243,8 +243,8 @@ function render(d){
     + (rj.note ? '<p class="note">'+T(rj.note)+'</p>' : '');
   var ksBody = (ks.items || []).map(function(it){
     var def = it.rej - it.conv, defR = it.rej ? def / it.rej * 100 : 0, convR = it.rej ? it.conv / it.rej * 100 : 0;
-    return '<div class="ksi"><div class="two"><div><div class="k">'+esc(it.n)+'</div><div class="v num" style="font-size:24px">'+defR.toFixed(1)+'<small>% 그대로 사용</small></div></div>'
-      + '<div class="right"><div class="k">안내 / 다시 신청</div><div class="v num" style="font-size:19px">'+it.rej+' / '+it.conv+'</div></div></div>'
+    return '<div class="ksi"><div class="two"><div><div class="k">'+esc(it.n)+'</div><div class="v num" style="font-size:24px">'+defR.toFixed(1)+'<small>% 방어</small></div></div>'
+      + '<div class="right"><div class="k">반려 / 재인입</div><div class="v num" style="font-size:19px">'+it.rej+' / '+it.conv+'</div></div></div>'
       + '<div class="track"><i style="width:'+convR.toFixed(1)+'%"></i></div>'
       + (it.note ? '<p class="note" style="margin-top:12px">'+T(it.note)+'</p>' : '')+'</div>';
   }).join('');
@@ -304,7 +304,7 @@ function drawAll(d){
     drawLine(document.getElementById('trendLine'), ms.map(function(m){ return m.m; }), ms.map(function(m){ return m.rate; }), { fmt: function(v){ return v.toFixed(2)+'%'; }, annot: '집계 중', every: 1 });
     document.getElementById('trendTable').innerHTML = '<tr><th>구분</th>'+ms.map(function(m){ return '<th class="n">'+esc(m.m)+'</th>'; }).join('')+'</tr>'
       + (d.trend.rows || []).map(function(r){ return '<tr><td class="name">'+T(r.k)+'</td>'+ms.map(function(m){ var v = m[r.f]; return '<td class="n">'+(typeof v === 'number' ? n(v) : esc(v))+'</td>'; }).join('')+'</tr>'; }).join('')
-      + '<tr><td class="name">반품·교환 비율</td>'+ms.map(function(m){ return '<td class="n">'+Number(m.rate).toFixed(2)+'%</td>'; }).join('')+'</tr>';
+      + '<tr><td class="name">반품·교환률</td>'+ms.map(function(m){ return '<td class="n">'+Number(m.rate).toFixed(2)+'%</td>'; }).join('')+'</tr>';
   }
 
   var ev = d.event, el = document.getElementById('evLine');
