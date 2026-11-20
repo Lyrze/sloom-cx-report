@@ -12,18 +12,8 @@
   --warn:#8a5a12; --warn-soft:#fbf3e4; --good:#1b6e47; --good-soft:#e8f4ed;
   --grid:#e5e8ea; --gap:24px; --pad:24px; --radius:8px;
 }
-@media (prefers-color-scheme:dark){
-  :root{
-    --chrome:#0f1316; --surface:#171c20; --raised:#1e2428; --active:#242b30;
-    --border:#2a3136; --rule:#242a2f; --control:#3a4248;
-    --text:#eef1f3; --muted:#b8bec4; --faint:#8f969c; --accent:#5fb3c6;
-    --accent-soft:#16272c; --accent-track:#1f3a41;
-    --s1:#5fb3c6; --s2:#4a93a4; --s3:#3a7482; --s4:#2c5661; --s5:#213e46;
-    --flat:#6b7378; --flat-2:#444c52;
-    --positive:#5ec48f; --negative:#f07c82; --neg-soft:#2a1a1b; --neg-line:#4a2a2c;
-    --warn:#e2b265; --warn-soft:#2a2213; --good:#5ec48f; --good-soft:#15291e; --grid:#2a3136;
-  }
-}
+/* 다크모드 컴퓨터에서도 밝은 화면으로 고정 (2026-11-20) */
+:root{color-scheme:light}
 *{box-sizing:border-box}
 html,body{margin:0}
 html{scroll-behavior:smooth}
